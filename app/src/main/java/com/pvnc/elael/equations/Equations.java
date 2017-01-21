@@ -1,12 +1,19 @@
 package com.pvnc.elael.equations;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.GridLayout;
+import android.widget.TextView;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -82,6 +89,9 @@ public class Equations extends AppCompatActivity {
             return false;
         }
     };
+    private TextView mFieldXView;
+    private GridLayout mEqRHS;
+    private FrameLayout mRHS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,13 +102,64 @@ public class Equations extends AppCompatActivity {
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
-
+        mFieldXView = (TextView) findViewById(R.id.fieldx);
+        mRHS = (FrameLayout) findViewById(R.id.frame_rhs);
+        mEqRHS = (GridLayout) findViewById(R.id.rhs);
 
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 toggle();
+            }
+        });
+
+        mFieldXView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    ClipData.Item item = new ClipData.Item(((TextView)v).getText());
+
+                    ClipData dragData = new ClipData(((TextView)v).getText(), new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN},item);
+
+                    // Instantiates the drag shadow builder.
+                    View.DragShadowBuilder myShadow = new View.DragShadowBuilder(mFieldXView);
+
+                    // Starts the drag
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+                        v.startDragAndDrop(dragData,  // the data to be dragged
+                                myShadow,  // the drag shadow builder
+                                v,      // no need to use local data
+                                0          // flags (not currently used, set to 0)
+                        );
+                    } else{
+                        v.startDrag(dragData,  // the data to be dragged
+                                myShadow,  // the drag shadow builder
+                                v,      // no need to use local data
+                                0          // flags (not currently used, set to 0)
+                        );
+                    }
+
+                }
+                return false;
+            }
+        });
+
+        mRHS.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                switch (event.getAction()){
+                    case DragEvent.ACTION_DROP:
+                        View view = (View) event.getLocalState();
+                        ViewGroup owner = (ViewGroup) view.getParent();
+                        owner.removeView(view);
+                        mEqRHS.addView(view);
+                        view.setVisibility(View.VISIBLE);
+                        break;
+
+                }
+                return true;
             }
         });
 
