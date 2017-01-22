@@ -114,7 +114,7 @@ public class Equations extends AppCompatActivity {
             }
         });
 
-        mFieldXView.setOnTouchListener(new View.OnTouchListener() {
+/*        mFieldXView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -161,7 +161,7 @@ public class Equations extends AppCompatActivity {
                 }
                 return true;
             }
-        });
+        });*/
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
